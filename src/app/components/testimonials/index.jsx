@@ -8,16 +8,23 @@ export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    // Buscar avaliações do site no backend
-    fetch("http://localhost:4000/avaliacoes/site")
-      .then((response) => response.json())
-      .then((data) => {
-        setTestimonials(data); // Atualiza o estado com as avaliações
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar avaliações:", error);
-      });
-  }, []);
+  fetch("http://localhost:4000/avaliacoes/site")
+    .then((response) => response.json())
+    .then((data) => {
+      // Verifica se o retorno é um array
+      if (Array.isArray(data)) {
+        setTestimonials(data);
+      } else if (data.avaliacoes && Array.isArray(data.avaliacoes)) {
+        setTestimonials(data.avaliacoes); // Caso o backend retorne um objeto com chave "avaliacoes"
+      } else {
+        console.error("Formato de dados inválido:", data);
+        setTestimonials([]); // Define um array vazio como fallback
+      }
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar avaliações:", error);
+    });
+}, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
